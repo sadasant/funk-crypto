@@ -1,4 +1,4 @@
-module RubyDES
+module Crypto::DES
   IP_L = [0x3a, 0x32, 0x2a, 0x22, 0x1a, 0x12, 0x0a, 0x02,
           0x3c, 0x34, 0x2c, 0x24, 0x1c, 0x14, 0x0c, 0x04,
           0x3e, 0x36, 0x2e, 0x26, 0x1e, 0x16, 0x0e, 0x06,
@@ -22,8 +22,8 @@ module RubyDES
     attr_reader :data, :key
 
     def initialize(data, key)
-      unless data.is_a?(RubyDES::Block) and key.is_a?(RubyDES::Block)
-        raise "RubyDES::InvalidBlockFormat: Data and key must be a Block object."
+      unless data.is_a?(DES::Block) and key.is_a?(DES::Block)
+        raise "DES::InvalidBlockFormat: Data and key must be a Block object."
       end
 
       @data = data
@@ -59,7 +59,7 @@ module RubyDES
         r << XOR.run(Feistel.run(r[i], k[i]), l[i])
       end
 
-      return RubyDES::Block.new(FP.collect{|p| (r.last + l.last)[p - 1]})
+      return DES::Block.new(FP.collect{|p| (r.last + l.last)[p - 1]})
     end
   end
 
@@ -68,19 +68,19 @@ module RubyDES
 
     def initialize(input)
       if input.is_a?(String)
-        raise "RubyDES::InvalidStringLength: Input String must contain (8) characters." unless input.length.eql?(8)
+        raise "DES::InvalidStringLength: Input String must contain (8) characters." unless input.length.eql?(8)
 
         @string = input
         bin     = ""
         input.unpack("C*").each{|c| bin << "%08b" % c}
         @bit_array = bin.split('').collect{|b| b.to_i}
       elsif input.is_a?(Array)
-        raise "RubyDES::InvalidArraySize: Input Array must contain (64) bits." unless input.size.eql?(64)
+        raise "DES::InvalidArraySize: Input Array must contain (64) bits." unless input.size.eql?(64)
 
         @string    = [input.join.to_i(2).to_s(16)].pack("H*")
         @bit_array = input
       else
-        raise "RubyDES::InvalidFormat: Input must be a String or an Array."
+        raise "DES::InvalidFormat: Input must be a String or an Array."
       end
     end
   end

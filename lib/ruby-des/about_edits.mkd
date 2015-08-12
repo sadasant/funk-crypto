@@ -1,0 +1,11 @@
+﻿Several edits were made to make sure that ruby-des work for mruby and
+the CloudWalk structure.
+
+Changes include:
+- Changing the module `RubyDES` to be named `DES` and to be a
+  submodule of `Crypto`.
+- Changing all the `RubyDES` submodule and classes to be part of
+  `Crypto::DES`.
+
+Author of the changes:
+    Daniel Rodriguez <sadasant@gmail.com>

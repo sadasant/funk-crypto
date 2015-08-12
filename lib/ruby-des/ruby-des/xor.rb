@@ -1,4 +1,4 @@
-module XOR
+module Crypto::DES::XOR
   def self.run(x, y)
     output = []
 

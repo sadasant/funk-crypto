@@ -1,4 +1,4 @@
-class KeySchedule
+class Crypto::DES::KeySchedule
   attr_accessor :sub_keys
   attr_reader :key
 

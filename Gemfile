@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
 
-gemspec
+gem 'da_funk', :git => 'https://github.com/cloudwalkio/da_funk.git'
+gem 'rake'

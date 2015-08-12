@@ -1,7 +1,10 @@
-PATH
-  remote: .
+GIT
+  remote: https://github.com/cloudwalkio/da_funk.git
+  revision: b19787138104a516800704ea9de97566a622ecde
   specs:
-    crypto (0.0.0)
+    da_funk (0.4.9)
+      bundler (~> 1.7)
+      rake (~> 10.4)
 
 GEM
   remote: https://rubygems.org/
@@ -12,6 +15,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.7)
-  rake (~> 10.0)
-  crypto!
+  da_funk!
+  rake

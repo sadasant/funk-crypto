@@ -1,4 +1,3 @@
-require "ruby-des/ruby-des"
 
 module Crypto
   class DES < RubyDES

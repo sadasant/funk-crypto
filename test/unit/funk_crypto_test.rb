@@ -41,4 +41,14 @@ class FunkCryptoTest < DaFunk::Test.case
 
     assert_equal decrypted_data, secret
   end
+
+  def test_newdes_enc_dec
+    secret = 'mysecret'
+    key    = '0123456701234567'
+
+    encrypted_data = Crypto::NEWDES.encrypt(secret, key)
+    decrypted_data = Crypto::NEWDES.decrypt(encrypted_data, key)
+
+    assert_equal decrypted_data, secret
+  end
 end

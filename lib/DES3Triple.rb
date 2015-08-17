@@ -1,5 +1,5 @@
 module Crypto
-  class DES3
+  class DES3Triple
     def self.fill_data data
       bytes = data.length / 2
 
@@ -44,7 +44,7 @@ module Crypto
     end
 
     def self.check_key(key)
-      if key.size < 16
+      if key.size < 16 || key.size%3 != 0 || key.size/3 < 16
         rise
       end
     end
@@ -52,24 +52,29 @@ module Crypto
     def self.encrypt(data, key)
       check_key(key)
 
-      data      = fill_data(data)
-      key_left  = key[0..15]
-      key_right = key[16..31]
+      data = fill_data(data)
 
-      result = encrypt_blocks(data, key_left)
-      result = decrypt_blocks(result, key_right)
-      result = encrypt_blocks(result, key_left)
+      key_block_size = key.size/3
+      key_1 = key[0..(key_block_size-1)]
+      key_2 = key[key_block_size..((key_block_size*2)-1)]
+      key_3 = key[(key_block_size*2)..-1]
+
+      result = encrypt_blocks(data, key_3)
+      result = decrypt_blocks(result, key_2)
+      result = encrypt_blocks(result, key_1)
     end
 
     def self.decrypt(cypher, key)
       check_key(key)
 
-      key_left  = key[0..15]
-      key_right = key[16..31]
+      key_block_size = key.size/3
+      key_1 = key[0..(key_block_size-1)]
+      key_2 = key[key_block_size..((key_block_size*2)-1)]
+      key_3 = key[(key_block_size*2)..-1]
 
-      result = decrypt_blocks(cypher, key_left)
-      result = encrypt_blocks(result, key_right)
-      result = decrypt_blocks(result, key_left)
+      result = decrypt_blocks(cypher, key_1)
+      result = encrypt_blocks(result, key_2)
+      result = decrypt_blocks(result, key_3)
     end
   end
 end

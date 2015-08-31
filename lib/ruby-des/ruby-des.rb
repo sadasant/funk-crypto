@@ -68,7 +68,6 @@ module Crypto::DES
 
     def initialize(input)
       if input.is_a?(String)
-        p "STRING INPUT input:#{input}, size:#{input.size}" unless input.length.eql?(8)
         raise "DES::InvalidStringLength: Input String must contain (8) characters." unless input.length.eql?(8)
 
         @string = input

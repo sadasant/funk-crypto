@@ -13,6 +13,21 @@ module Crypto
       KSN_MASK        = "1208925819614629172609024".to_bn               # 0xFFFFFFFFFFFFFFE00000
       DEK_MASK        = "308276084001730439566786560".to_bn             # 0x0000000000FF00000000000000FF0000
 
+      # ================
+      # MRUBY MATH FIXES
+      def btoi(b)
+        sum = 0
+        size = b.size - 1
+        size.downto(0) do |i|
+          n = size-i
+          if !(i == 0 && b[n].to_i == 0)
+            sum += (b[n].to_i*2).to_bn ** i
+          end
+        end
+        sum
+      end
+      # ================
+
       def cipher_mode=(cipher_type)
         if cipher_type == "ecb"
           @cipher_type_des = "des-ecb"
@@ -47,8 +62,13 @@ module Crypto
         cr2  = encrypt_register(key, cr1)
         key2 = key ^ KEY_MASK
         cr1  = encrypt_register(key2, cr1)
-
-        [hex_string_from_val(cr1, 8), hex_string_from_val(cr2, 8)].join.to_bn(16)
+        bins = ""
+        [hex_string_from_val(cr1, 8), hex_string_from_val(cr2, 8)].join.each_char do |b|
+          bin = b.to_i(16).to_s(2)
+          bin = ("0"*(4-bin.size)) + bin if bin.size < 4
+          bins << bin
+        end
+        btoi(bins)
       end
 
       def pek_from_key(key)
@@ -96,11 +116,6 @@ module Crypto
           rjust_value = "0"*(size - rjust_value.size) + rjust_value
         end
         rjust_value
-
-        # OK LETS DO THIS DIFFERENTLY
-        # val to binary, with this:
-        # https://gist.github.com/sadasant/c45a1b4e25a8b7dfc5ba
-        # then binary to hex, with this:
       end
 
       def encrypt_register(curkey, reg_8)

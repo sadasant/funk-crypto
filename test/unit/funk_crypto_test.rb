@@ -52,13 +52,38 @@ class FunkCryptoTest < DaFunk::Test.case
     assert_equal decrypted_data, secret
   end
 
-  def test_dukpt_decrypter
-    bdk = "0123456789ABCDEFFEDCBA9876543210"
-    ksn = "FFFF9876543210E00008"
-    ciphertext = "C25C1D1197D31CAA87285D59A892047426D9182EC11353C051ADD6D0F072A6CB3436560B3071FC1FD11D9F7E74886742D9BEE0CFD1EA1064C213BB55278B2F12"
-    plaintext = "%B5452300551227189^HOGAN/PAUL      ^08043210000000725000000?\x00\x00\x00\x00"
-
-    decrypter = Crypto::DUKPT::Decrypter.new(bdk, "cbc")
-    assert_equal plaintext, decrypter.decrypt(ciphertext, ksn)
+  def test_dukpt_encryption_derive_ipek
+     ksn = "FFFF9876543210E00008"
+     bdk = "0123456789ABCDEFFEDCBA9876543210"
+     DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+     ipek = DUK.derive_IPEK(bdk, ksn)
+     assert_equal '6ac292faa1315b4d858ab3a3d7d5933a', ipek
   end
+
+  def test_dukpt_encryption_derive_pek
+     ksn = "FFFF9876543210E00008"
+     DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+     pek = DUK.derive_PEK('6ac292faa1315b4d858ab3a3d7d5933a', ksn)
+     assert_equal '27f66d5244ff621eaa6f6120edeb427f', pek
+  end
+
+  def test_dukpt_encryption_derive_key_3
+     ksn = "FFFF9876543210E00003"
+     DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+     key = DUK.derive_key('6ac292faa1315b4d858ab3a3d7d5933a', ksn)
+     assert_equal '0DF3D9422ACA56E547676D07AD6BADFA', key.upcase
+  end
+
+  # def test_dukpt_decrypter
+  #   bdk = "0123456789ABCDEFFEDCBA9876543210"
+  #   ksn = "FFFF9876543210E00008"
+  #   ciphertext = "C25C1D1197D31CAA87285D59A892047426D9182EC11353C051ADD6D0F072A6CB3436560B3071FC1FD11D9F7E74886742D9BEE0CFD1EA1064C213BB55278B2F12"
+  #   plaintext = "%B5452300551227189^HOGAN/PAUL      ^08043210000000725000000?\x00\x00\x00\x00"
+
+  #   decrypter = Crypto::DUKPT::Decrypter.new(bdk, "cbc")
+  #   decrypted_data = decrypter.decrypt(ciphertext, ksn)
+  #   p "decrypted_data:#{decrypted_data}"
+  #   p "decrypted_data.unpack(\"H*\"):#{decrypted_data.unpack("H*")}"
+  #   assert_equal plaintext, decrypted_data
+  # end
 end

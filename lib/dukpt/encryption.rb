@@ -26,6 +26,15 @@ module Crypto
         end
         sum
       end
+      def hextob(hex)
+        bins = ""
+        hex.each_char do |b|
+          bin = b.to_i(16).to_s(2)
+          bin = ("0"*(4-bin.size)) + bin if bin.size < 4
+          bins << bin
+        end
+        bins
+      end
       # ================
 
       def cipher_mode=(cipher_type)
@@ -62,17 +71,13 @@ module Crypto
         cr2  = encrypt_register(key, cr1)
         key2 = key ^ KEY_MASK
         cr1  = encrypt_register(key2, cr1)
-        bins = ""
-        [hex_string_from_val(cr1, 8), hex_string_from_val(cr2, 8)].join.each_char do |b|
-          bin = b.to_i(16).to_s(2)
-          bin = ("0"*(4-bin.size)) + bin if bin.size < 4
-          bins << bin
-        end
-        btoi(bins)
+        hex = [hex_string_from_val(cr1, 8), hex_string_from_val(cr2, 8)].join
+        btoi(hextob(hex))
       end
 
       def pek_from_key(key)
-        hex_string_from_val((key.to_bn(16) ^ PEK_MASK), 16)
+        key_i = btoi(hextob(key))
+        hex_string_from_val((key_i ^ PEK_MASK), 16)
       end
 
       def dek_from_key(key)
@@ -93,7 +98,7 @@ module Crypto
       end
 
       def derive_PEK(ipek, ksn)
-        pek_from_key(derive_key(ipek, ksn))      
+        pek_from_key(derive_key(ipek, ksn))
       end
 
       def derive_DEK(ipek, ksn)

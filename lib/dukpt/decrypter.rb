@@ -18,9 +18,13 @@ module Crypto
       end
 
       def decrypt(cryptogram, ksn)
+        p "decrypt cryptogram:#{cryptogram}, bdk:#{bdk}, ksn:#{ksn}"
         ipek = derive_IPEK(bdk, ksn)
         pek  = derive_PEK(ipek, ksn)
+        p "decrypt ipek:#{ipek}, pek:#{pek}"
+        p "BEFORE decrypted_cryptogram cryptogram:#{cryptogram}, pek:#{pek}"
         decrypted_cryptogram = Crypto::DES3.decrypt(cryptogram, pek)
+        p "decrypted_cryptogram:#{decrypted_cryptogram}"
         [decrypted_cryptogram].pack('H*')
       end
 

@@ -81,6 +81,41 @@ class FunkCryptoTest < DaFunk::Test.case
     assert_equal '0DF3D9422ACA561A47676D07AD6BAD05', pek.upcase
   end
 
+  def test_dukpt_encryption_derive_pek_counter_7
+    ksn = "FFFF9876543210E00007"
+    DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+    pek = DUK.derive_PEK('6ac292faa1315b4d858ab3a3d7d5933a', ksn)
+    assert_equal '0C8F780B7C8B492FAE84A9EB2A6CE69F', pek.upcase
+  end
+
+  def test_dukpt_encryption_derive_pek_counter_F
+    ksn = "FFFF9876543210E0000F"
+    DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+    pek = DUK.derive_PEK('6ac292faa1315b4d858ab3a3d7d5933a', ksn)
+    assert_equal '93DD5B956C4878B82E453AAEFD32A555', pek.upcase
+  end
+
+  def test_dukpt_encryption_derive_pek_counter_10
+    ksn = "FFFF9876543210E00010"
+    DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+    pek = DUK.derive_PEK('6ac292faa1315b4d858ab3a3d7d5933a', ksn)
+    assert_equal '59598DCBD9BD943F94165CE453585FA8', pek.upcase
+  end
+
+  def test_dukpt_encryption_derive_pek_counter_13
+    ksn = "FFFF9876543210E00013"
+    DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+    pek = DUK.derive_PEK('6ac292faa1315b4d858ab3a3d7d5933a', ksn)
+    assert_equal 'C3DF489FDF11534BF03DE97C27DC4CD0', pek.upcase
+  end
+
+  def test_dukpt_encryption_derive_pek_counter_EFF800
+    ksn = "FFFF9876543210EFF800"
+    DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+    pek = DUK.derive_PEK('6ac292faa1315b4d858ab3a3d7d5933a', ksn)
+    assert_equal 'F9CDFEBF4F5B1D61B3EC12454527E189', pek.upcase
+  end
+
   # def test_dukpt_decrypter
   #   bdk = "0123456789ABCDEFFEDCBA9876543210"
   #   ksn = "FFFF9876543210E00008"

@@ -66,7 +66,7 @@ module Crypto::DES::Feistel
 
     e = E.collect{|p| r[p - 1]} # Expand r (right half data block) using E.
 
-    e_xor_k = XOR.run(e, k) # X-or e (expanded r) with k (the sub key).
+    e_xor_k = Crypto::DES::XOR.run(e, k) # X-or e (expanded r) with k (the sub key).
 
     # Break e_xor_k into 8 6-bit arrays and find both m (s-box row) and n (s-box column) for the s-box lookup.
     8.times do |i|

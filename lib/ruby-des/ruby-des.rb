@@ -22,7 +22,7 @@ module Crypto::DES
     attr_reader :data, :key
 
     def initialize(data, key)
-      unless data.is_a?(DES::Block) and key.is_a?(DES::Block)
+      unless data.is_a?(Block) and key.is_a?(Block)
         raise "DES::InvalidBlockFormat: Data and key must be a Block object."
       end
 
@@ -59,7 +59,7 @@ module Crypto::DES
         r << XOR.run(Feistel.run(r[i], k[i]), l[i])
       end
 
-      return DES::Block.new(FP.collect{|p| (r.last + l.last)[p - 1]})
+      return Crypto::DES::Block.new(FP.collect{|p| (r.last + l.last)[p - 1]})
     end
   end
 

@@ -123,6 +123,20 @@ class FunkCryptoTest < DaFunk::Test.case
     assert_equal '2542353435323330303535313232373138395e484f47414e2f5041554c2020202020205e30383034333231303030303030303732353030303030303f00000000', decryp
   end
 
+  def test_dukpt_dek_from_key
+    key = "27F66D5244FF62E1AA6F6120EDEB4280"
+    DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+    dek = DUK.dek_from_key(key)
+    assert_equal "C39B2778B058AC376FB18DC906F75CBA", dek.upcase
+  end
+
+  def test_dukpt_derive_dek_counter_13
+    ksn = "FFFF9876543210E00013"
+    DUK = Crypto::DUKPT::Decrypter.new(nil, nil)
+    dek = DUK.derive_DEK('6ac292faa1315b4d858ab3a3d7d5933a', ksn)
+    assert_equal '44893E3434ABDD6A817CE2841825E1FD', dek.upcase
+  end
+
   def test_dukpt_decrypter
     bdk = "0123456789ABCDEFFEDCBA9876543210"
     ksn = "FFFF9876543210E00008"

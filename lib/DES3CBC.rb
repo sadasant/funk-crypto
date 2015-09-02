@@ -78,6 +78,7 @@ module Crypto
         block = encrypt_block(block, key_right)
         block = decrypt_block(block, key_left)
         block = (Crypto.hextoi(block) ^ Crypto.hextoi(@iv)).to_s(16)
+        block = ("0"*(16-block.size)) + block if block.size < 16
         @iv   = args.join()
 
         result << block

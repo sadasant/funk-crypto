@@ -18,13 +18,9 @@ module Crypto
       end
 
       def decrypt(cryptogram, ksn)
-        p "decrypt cryptogram:#{cryptogram}, bdk:#{bdk}, ksn:#{ksn}"
         ipek = derive_IPEK(bdk, ksn)
         pek  = derive_PEK(ipek, ksn)
-        p "decrypt ipek:#{ipek}, pek:#{pek}"
-        p "BEFORE decrypted_cryptogram cryptogram:#{cryptogram}, pek:#{pek}"
-        decrypted_cryptogram = Crypto::DES3.decrypt(cryptogram, pek)
-        p "decrypted_cryptogram:#{decrypted_cryptogram}"
+        decrypted_cryptogram = Crypto::DES3CBC.decrypt(cryptogram, pek)
         [decrypted_cryptogram].pack('H*')
       end
 
@@ -54,7 +50,7 @@ module Crypto
       def decrypt_data_block(cryptogram, ksn)
         ipek = derive_IPEK(bdk, ksn)
         dek  = derive_DEK(ipek, ksn)
-        decrypted_cryptogram = Crypto::DES3.decrypt(cryptogram, dek)
+        decrypted_cryptogram = Crypto::DES3CBC.decrypt(cryptogram, dek)
         [decrypted_cryptogram].pack('H*')
       end
 

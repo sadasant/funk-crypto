@@ -13,30 +13,6 @@ module Crypto
       KSN_MASK        = "1208925819614629172609024".to_bn               # 0xFFFFFFFFFFFFFFE00000
       DEK_MASK        = "308276084001730439566786560".to_bn             # 0x0000000000FF00000000000000FF0000
 
-      # ================
-      # MRUBY MATH FIXES
-      def btoi(b)
-        sum = 0
-        size = b.size - 1
-        size.downto(0) do |i|
-          n = size-i
-          if !(i == 0 && b[n].to_i == 0)
-            sum += (b[n].to_i*2).to_bn ** i
-          end
-        end
-        sum
-      end
-      def hextob(hex)
-        bins = ""
-        hex.each_char do |b|
-          bin = b.to_i(16).to_s(2)
-          bin = ("0"*(4-bin.size)) + bin if bin.size < 4
-          bins << bin
-        end
-        bins
-      end
-      # ================
-
       def cipher_mode=(cipher_type)
         if cipher_type == "ecb"
           @cipher_type_des = "des-ecb"
@@ -72,11 +48,11 @@ module Crypto
         key2 = key ^ KEY_MASK
         cr1  = encrypt_register(key2, cr1)
         hex = [hex_string_from_val(cr1, 8), hex_string_from_val(cr2, 8)].join
-        btoi(hextob(hex))
+        Crypto.hextoi(hex)
       end
 
       def pek_from_key(key)
-        key_i = btoi(hextob(key))
+        key_i = Crypto.hextoi(key)
         hex_string_from_val((key_i ^ PEK_MASK), 16)
       end
 
@@ -88,8 +64,8 @@ module Crypto
 
         invariant_key_hex = hex_string_from_val(key, 16)
 
-        left  = DES3.encrypt(hex_string_from_val(left, 8), invariant_key_hex)
-        right = DES3.encrypt(hex_string_from_val(right, 8), invariant_key_hex)
+        left  = DES3CBC.encrypt(hex_string_from_val(left, 8), invariant_key_hex)
+        right = DES3CBC.encrypt(hex_string_from_val(right, 8), invariant_key_hex)
 
         left  = hex_string_from_val(left.to_bn(16), 8)
         right = hex_string_from_val(right.to_bn(16), 8)
@@ -107,9 +83,9 @@ module Crypto
 
       def derive_IPEK(bdk, ksn)
         ksn_cleared_count = (ksn.to_bn(16) & KSN_MASK) >> 16
-        left_half_of_ipek = DES3.encrypt(hex_string_from_val(ksn_cleared_count, 8), bdk)
+        left_half_of_ipek = DES3CBC.encrypt(hex_string_from_val(ksn_cleared_count, 8), bdk)
         xor_base_derivation_key = bdk.to_bn(16) ^ KEY_MASK
-        right_half_of_ipek = DES3.encrypt(hex_string_from_val(ksn_cleared_count, 8), hex_string_from_val(xor_base_derivation_key, 8))
+        right_half_of_ipek = DES3CBC.encrypt(hex_string_from_val(ksn_cleared_count, 8), hex_string_from_val(xor_base_derivation_key, 8))
         ipek_derived = left_half_of_ipek + right_half_of_ipek
         ipek_derived
       end

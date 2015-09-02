@@ -9,14 +9,14 @@ module Crypto
       return data
     end
 
-    def self.encrypt_blocks(data, key)
+    def self.encrypt_blocks(cypher, key)
       ret = ''
       key = [key].pack("H*")
       key = DES::Block.new(key)
-      data.split("").each_slice(16) do |*args|
-        block     = args.join()
-        block_hex = [block].pack("H*")
-        data      = DES::Block.new(block_hex)
+      cypher.split("").each_slice(16) do |*args|
+        block_hex = args.join()
+        block     = [block_hex].pack("H*")
+        data      = DES::Block.new(block)
         des       = DES::Ctx.new(data, key)
 
         encrypted_data = des.encrypt
@@ -26,15 +26,15 @@ module Crypto
       ret
     end
 
-    def self.decrypt_blocks(data, key)
+    def self.decrypt_blocks(cypher, key)
       ret = ''
       key = [key].pack("H*")
       key = DES::Block.new(key)
-      data.split("").each_slice(16) do |*args|
-        block = args.join()
-        block_hex = [block].pack("H*")
-        data  = DES::Block.new(block_hex)
-        des   = DES::Ctx.new(data, key)
+      cypher.split("").each_slice(16) do |*args|
+        block_hex = args.join()
+        block     = [block_hex].pack("H*")
+        data      = DES::Block.new(block)
+        des       = DES::Ctx.new(data, key)
 
         decrypted_data = des.decrypt
         decrypted_data = decrypted_data.string.unpack("H*")[0]

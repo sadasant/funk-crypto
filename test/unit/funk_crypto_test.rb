@@ -167,4 +167,15 @@ class FunkCryptoTest < DaFunk::Test.case
     decrypter = Crypto::DUKPT::Decrypter.new(bdk)
     assert_equal plaintext_pin, decrypter.decrypt_pin(ciphertext, ksn, pan)
   end
+
+  def test_dukpt_decrypt_pin_with_padded_pan
+    bdk = "0123456789ABCDEFFEDCBA9876543210"
+    ksn = "F8765432108D12400011"
+    ciphertext = "8C3169A2ABC1632F"
+    pan = "6799998900000060919F"
+    plaintext_pin = "4315"
+
+    decrypter = Crypto::DUKPT::Decrypter.new(bdk)
+    assert_equal plaintext_pin, decrypter.decrypt_pin(ciphertext, ksn, pan)
+  end
 end

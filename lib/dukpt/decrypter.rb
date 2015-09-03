@@ -39,11 +39,11 @@ module Crypto
             rjust_value = "0"*(16 - rjust_value.size) + rjust_value
           end
           coded_pin = rjust_value
-          pin_count = coded_pin[1].to_bn
-          coded_pin[2,pin_count]
+          pin_count = coded_pin[1].to_bn.to_fix
+          coded_pin[2, pin_count]
         elsif block_format == "1"
           pin_count = decrypted_block[1]
-          coded_pin[2,pin_count]
+          coded_pin[2, pin_count]
         end
       end
 

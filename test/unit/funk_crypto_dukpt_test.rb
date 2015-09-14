@@ -90,8 +90,8 @@ class FunkCryptoTest < DaFunk::Test.case
     ciphertext = "C25C1D1197D31CAA87285D59A892047426D9182EC11353C051ADD6D0F072A6CB3436560B3071FC1FD11D9F7E74886742D9BEE0CFD1EA1064C213BB55278B2F12"
     plaintext = "%B5452300551227189^HOGAN/PAUL      ^08043210000000725000000?\x00\x00\x00\x00"
 
-    decrypter = Crypto::DUKPT::Decrypter.new(bdk, "cbc")
-    decrypted_data = decrypter.decrypt(ciphertext, ksn)
+    DUK = Crypto::DUKPT::Decrypter.new(bdk, "cbc")
+    decrypted_data = DUK.decrypt(ciphertext, ksn)
     assert_equal plaintext, decrypted_data
   end
 
@@ -100,8 +100,8 @@ class FunkCryptoTest < DaFunk::Test.case
     ksn = "FFFF01040DA058E00001"
     ciphertext = "85A8A7F9390FD19EABC40B5D624190287D729923D9EDAFE9F24773388A9A1BEF"
     plaintext = ["5A08476173900101001057114761739001010010D15122011143878089000000"].pack("H*")
-    decrypter = Crypto::DUKPT::Decrypter.new(bdk, "cbc")
-    assert_equal plaintext, decrypter.decrypt_data_block(ciphertext, ksn)
+    DUK = Crypto::DUKPT::Decrypter.new(bdk, "cbc")
+    assert_equal plaintext, DUK.decrypt_data_block(ciphertext, ksn)
   end
 
   def test_dukpt_decrypt_pin
@@ -111,8 +111,8 @@ class FunkCryptoTest < DaFunk::Test.case
     pan = "5413330089601109"
     plaintext_pin = "4315"
 
-    decrypter = Crypto::DUKPT::Decrypter.new(bdk)
-    assert_equal plaintext_pin, decrypter.decrypt_pin(ciphertext, ksn, pan)
+    DUK = Crypto::DUKPT::Decrypter.new(bdk)
+    assert_equal plaintext_pin, DUK.decrypt_pin(ciphertext, ksn, pan)
   end
 
   def test_dukpt_decrypt_pin_with_padded_pan
@@ -122,7 +122,42 @@ class FunkCryptoTest < DaFunk::Test.case
     pan = "6799998900000060919F"
     plaintext_pin = "4315"
 
-    decrypter = Crypto::DUKPT::Decrypter.new(bdk)
-    assert_equal plaintext_pin, decrypter.decrypt_pin(ciphertext, ksn, pan)
+    DUK = Crypto::DUKPT::Decrypter.new(bdk)
+    assert_equal plaintext_pin, DUK.decrypt_pin(ciphertext, ksn, pan)
+  end
+
+  def test_dukpt_decrypt_cloudwalk_pin
+    # based on: https://github.com/cloudwalkio/robot_rock/blob/master/mrblib/init.rb#L18
+    bdk = "0123456789ABCDEFFEDCBA9876543210"
+    ksn = "FFFF9876543210E00001"
+    pan = "00004012345678909"
+    pin = "1234"
+    epb = "1B9C1845EB993A7A"
+
+    DUK = Crypto::DUKPT::Decrypter.new(bdk)
+    plaintext = DUK.decrypt_pin(epb, ksn, pan)
+    assert_equal pin, plaintext
+  end
+
+  def test_dukpt_decrypt_cloudwalk_epb
+    bdk = "0123456789ABCDEFFEDCBA9876543210"
+    ksn = "FFFF9876543210E00001"
+    pan = "00004012345678909"
+    pin = "1234"
+    epb = "1B9C1845EB993A7A"
+
+    DUK = Crypto::DUKPT::Decrypter.new(bdk)
+
+    ipek = DUK.derive_IPEK(bdk, ksn)
+    pek  = DUK.derive_PEK(ipek, ksn)
+
+    pin       = "04#{pin}ffffffffff"
+    coded_pan = "0000"+pan[-13..-2]
+    cipherpin = (pin.to_bn(16) ^ coded_pan.to_bn(16)).to_s(16)
+    if cipherpin.size < 16
+      cipherpin = ("0"*(16-cipherpin.size)) + cipherpin
+    end
+    ciphertext = Crypto::DES3CBC.encrypt(cipherpin, pek)
+    assert_equal epb, ciphertext.upcase
   end
 end

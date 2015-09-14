@@ -52,6 +52,7 @@ module Crypto
       data.split("").each_slice(16) do |*args|
         block = args.join()
         block = (Crypto.hextoi(block) ^ Crypto.hextoi(@iv)).to_s(16)
+        block = ("0"*(16-block.size)) + block if block.size < 16
 
         block = encrypt_block(block, key_left)
         block = decrypt_block(block, key_right)
